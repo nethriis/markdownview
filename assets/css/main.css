@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body * {
+  font-family: 'Geist Sans', sans-serif !important;
+}
+
+.monaco-editor .scroll-decoration {
+  display: none;
+}
+
+.mtk8 {
+  font-weight: 700 !important;
+}
