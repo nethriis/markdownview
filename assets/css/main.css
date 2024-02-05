@@ -6,12 +6,33 @@ body * {
   font-family: 'Geist Sans', sans-serif !important;
 }
 
-.monaco-editor .scroll-decoration {
-  display: none;
+.cm-editor {
+  height: 100%;
 }
 
-.mtk8 {
-  font-weight: 700 !important;
+.cm-editor .cm-content * {
+  font-family: 'Geist Mono', sans-serif !important;
+  font-size: 14px !important;
+}
+
+.cm-editor .cm-gutters * {
+  font-family: 'Geist Mono', sans-serif !important;
+  font-size: 12px !important;
+}
+
+.cm-foldPlaceholder {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.cm-gutterElement {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+}
+
+.cm-gutter.cm-lineNumbers {
+  width: 40px;
 }
 
 a.router-link-active {

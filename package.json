@@ -21,15 +21,18 @@
     "vue-router": "^4.2.5"
   },
   "dependencies": {
+    "@codemirror/lang-markdown": "^6.2.4",
+    "@codemirror/language-data": "^6.4.0",
+    "@codemirror/state": "^6.4.0",
     "@fontsource/geist-mono": "^5.0.1",
     "@fontsource/geist-sans": "^5.0.1",
     "@nuxt/ui": "^2.13.0",
     "@nuxtjs/seo": "^2.0.0-rc.7",
+    "@uiw/codemirror-theme-github": "^4.21.21",
     "@vueuse/core": "^10.7.2",
     "@vueuse/nuxt": "^10.7.2",
+    "codemirror": "^6.0.1",
     "marked": "^11.2.0",
-    "monaco-editor": "^0.45.0",
-    "nuxt-icon": "^0.6.8",
-    "nuxt-monaco-editor": "^1.2.7"
+    "nuxt-icon": "^0.6.8"
   }
 }

@@ -1,45 +1,24 @@
 <script setup lang="ts">
 import { marked } from 'marked'
 
-const markdown = ref(
-  `# Welcome to MarkdownView
-
-This Markdown example is designed to help you get started with Markdown formatting. Markdown allows you to write using an easy-to-read, easy-to-write plain text format, which then converts to structurally valid HTML.
-
-## Basic Syntax
-
-Below are some of the most common elements of Markdown syntax.
-
-### Headings
-
-Headings from \`h0\` through \`h6\` are constructed with a \`#\` for each level:
-
-\`\`\`markdown
-# h1 Heading
-## h2 Heading
-### h3 Heading
-#### h4 Heading
-##### h5 Heading
-###### h6 Heading
-\`\`\`
-`
-)
+const content = ref('# Welcome to MarkdownView')
 const filename = ref('README.md')
 const loading = ref(false)
+const isOpen = ref(false)
 
 const headings = computed(() => {
-  const tokens = marked.lexer(markdown.value, { gfm: true })
+  const tokens = marked.lexer(content.value, { gfm: true })
   const filteredTokens = tokens.filter((token) => token.type === 'heading')
   return filteredTokens.map((token) => ({
     level: token.raw.match(/#/g)?.length || 0,
     text: token.raw.replace(/#+\s/, '')
   }))
 })
-const markdownToHtml = computed(() => marked(markdown.value))
+const markdownToHtml = computed(() => marked(content.value))
 
 const downloadMarkdown = () => {
   loading.value = true
-  const blob = new Blob([markdown.value], {
+  const blob = new Blob([content.value], {
     type: 'text/markdown;charset=utf-8'
   })
   const url = URL.createObjectURL(blob)
@@ -52,9 +31,10 @@ const downloadMarkdown = () => {
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
   loading.value = false
+  isOpen.value = true
 }
 
-const { copy, copied } = useClipboard({ source: markdown })
+const { copy, copied } = useClipboard({ source: content })
 </script>
 
 <template>
@@ -90,14 +70,17 @@ const { copy, copied } = useClipboard({ source: markdown })
           icon="ri:download-line"
           :loading="loading"
           @click="downloadMarkdown()"
-          >Download</UButton
         >
+          Download
+        </UButton>
       </div>
     </div>
     <div
-      class="flex sm:flex-row flex-col w-full sm:max-h-[calc(100vh-192px)] sm:h-[calc(100vh-192px)] sm:space-x-4 sm:space-y-0 space-y-4"
+      class="grid sm:grid-cols-2 grid-cols-1 grid-rows-2 gap-4 w-full sm:max-h-[calc(100vh-192px)] sm:h-[calc(100vh-192px)]"
     >
-      <div class="relative w-full bg-[#1e1e1e] rounded-xl overflow-hidden">
+      <div
+        class="relative bg-[#333338] h-[calc(100vh-192px)] pt-12 rounded-xl overflow-hidden"
+      >
         <div
           class="absolute top-4 flex items-center w-full px-4 space-x-1 z-30"
         >
@@ -116,23 +99,20 @@ const { copy, copied } = useClipboard({ source: markdown })
             name="filename"
             id="filename"
             v-model="filename"
-            class="leading-none text-sm text-gray-300 w-1/2 bg-transparent px-1 rounded-sm outline-none focus:bg-[#313131] focus:ring-1 focus:ring-blue-500"
+            class="leading-none text-sm text-gray-300 w-1/2 bg-transparent px-1 rounded-sm outline-none focus:bg-[#1e1e1e] focus:ring-1 focus:ring-blue-500"
           />
         </div>
-        <MonacoEditor
-          v-model="markdown"
-          lang="markdown"
-          :options="{ theme: 'vs-dark' }"
-          class="editor h-[600px] sm:h-full pt-12 pb-2"
-        />
+        <Editor v-model="content" class="max-w-full w-full h-full" />
         <UButton
           square
-          :icon="copied ? 'ri:check-line' : 'ri:file-copy-line'"
-          @click="copy(markdown)"
+          @click="copy(content)"
           class="absolute top-2 right-2 z-30"
-        />
+        >
+          <Icon v-if="copied" name="ri:check-line" size="20" />
+          <Icon v-else name="ri:file-copy-line" size="20" />
+        </UButton>
       </div>
-      <div class="w-full h-[600px] sm:h-full flex flex-col">
+      <div class="h-[calc(100vh-192px)] flex flex-col">
         <div
           class="relative flex w-full border border-gray-200 dark:border-gray-700 p-4 rounded-t-xl"
         >
@@ -185,9 +165,13 @@ const { copy, copied } = useClipboard({ source: markdown })
           </div>
         </div>
         <div
-          v-html="markdownToHtml"
-          class="view text-gray-900 dark:text-white w-full max-h-full h-full flex-grow flex flex-col space-y-4 p-4 border-x border-b border-x-gray-200 border-b-gray-200 dark:border-x-gray-700 dark:border-b-gray-700 rounded-b-xl overflow-auto"
-        />
+          class="w-full max-h-[calc(100%-50px)] h-[calc(100%-50px)] flex-grow flex flex-col p-4 border-x border-b border-x-gray-200 border-b-gray-200 dark:border-x-gray-700 dark:border-b-gray-700 rounded-b-xl"
+        >
+          <div
+            v-html="markdownToHtml"
+            class="view text-gray-900 dark:text-white h-full max-h-full space-y-4 overflow-auto"
+          ></div>
+        </div>
       </div>
       <UButton
         block
@@ -195,8 +179,42 @@ const { copy, copied } = useClipboard({ source: markdown })
         :loading="loading"
         @click="downloadMarkdown()"
         class="block sm:hidden"
-        >Download</UButton
       >
+        Download
+      </UButton>
+      <UModal v-model="isOpen" :ui="{ width: 'w-fit' }">
+        <div class="max-w-sm p-6 space-y-6">
+          <p class="text-center text-7xl">📜</p>
+          <h3
+            class="text-center text-lg text-gray-900 dark:text-white font-medium"
+          >
+            {{ filename }} generated successfully!
+          </h3>
+          <p
+            class="text-center text-sm text-gray-500 dark:text-gray-400 flex flex-col items-center space-y-2"
+          >
+            <span>
+              Thanks for using MarkdownView. Do not hesitate to give me your
+              feedback or suggestions.
+            </span>
+            <span>
+              You can support me by buying me a coffee or sponsoring me on
+              github.
+            </span>
+          </p>
+          <div class="flex justify-center space-x-4">
+            <UButton
+              variant="outline"
+              size="sm"
+              icon="ri:heart-line"
+              to="https://github.com/sponsors/nethriis"
+              target="_blank"
+            >
+              Sponsor
+            </UButton>
+          </div>
+        </div>
+      </UModal>
     </div>
   </div>
 </template>
@@ -272,16 +290,17 @@ const { copy, copied } = useClipboard({ source: markdown })
   list-style: decimal;
 }
 
+.view code {
+  font-family: 'Geist Mono', sans-serif !important;
+  @apply text-sm bg-gray-200 dark:bg-gray-700 px-1.5 py-1 rounded-md;
+}
+
 .view pre {
   @apply text-sm bg-gray-100 dark:bg-gray-800 p-4;
 }
 
-.view p code {
-  @apply text-sm bg-gray-200 dark:bg-gray-700 px-1.5 py-1 rounded-md;
-}
-
-.view code {
-  font-family: 'Geist Mono', sans-serif !important;
+.view pre code {
+  @apply bg-gray-100 dark:bg-gray-800 p-0 rounded-none;
 }
 
 .view table {
