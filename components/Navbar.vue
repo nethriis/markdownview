@@ -8,12 +8,21 @@ const isDark = computed({
     colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
   }
 })
+
+const { data: repo } = await useFetch<any>(
+  'https://api.github.com/repos/nethriis/markdownview'
+)
 </script>
 
 <template>
-  <div class="border-b border-b-gray-200 dark:border-b-gray-700">
+  <div
+    class="border-b-gray-200 dark:border-b-gray-700"
+    :class="{
+      'border-b': $route.path !== '/'
+    }"
+  >
     <nav class="flex items-center justify-between max-w-7xl h-16 px-4 mx-auto">
-      <div class="flex items-center w-full">
+      <div class="flex items-center">
         <NuxtLink to="/">
           <ClientOnly>
             <svg
@@ -33,6 +42,16 @@ const isDark = computed({
           </ClientOnly>
         </NuxtLink>
       </div>
+      <ul class="flex items-center">
+        <li>
+          <NuxtLink
+            to="/editor"
+            class="text-gray-700 hover:text-indigo-500 dark:hover:text-indigo-400 dark:text-white text-sm font-medium"
+          >
+            Editor
+          </NuxtLink>
+        </li>
+      </ul>
       <ul class="flex items-center space-x-2">
         <li>
           <ClientOnly>
@@ -48,12 +67,17 @@ const isDark = computed({
           </ClientOnly>
         </li>
         <li>
-          <UButton color="gray" variant="ghost" square class="relative w-8 h-8">
-            <Icon
-              class="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2"
-              name="ri:github-fill"
-              size="24"
-            />
+          <UButton
+            v-if="repo"
+            color="gray"
+            variant="ghost"
+            to="https://github.com/nethriis/markdownview"
+            target="_blank"
+          >
+            <Icon name="ri:github-fill" size="20" />
+            <span>
+              {{ repo?.stargazers_count }}
+            </span>
           </UButton>
         </li>
       </ul>

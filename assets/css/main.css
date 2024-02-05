@@ -13,3 +13,7 @@ body * {
 .mtk8 {
   font-weight: 700 !important;
 }
+
+a.router-link-active {
+  @apply text-indigo-500 dark:text-indigo-400;
+}
