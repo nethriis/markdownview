@@ -1,75 +1,31 @@
-# Nuxt 3 Minimal Starter
+<a href="https://markdownview.com">
+  <img src="https://raw.githubusercontent.com/nethriis/markdownview/main/assets/images/og-image.png" />
+</a>
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+# MarkdownView Editor
 
-## Setup
+## Introduction
+MarkdownView Editor is a web-based tool designed for editing and previewing Markdown files in real-time. Ideal for writers, developers, and content creators seeking a straightforward and efficient way to work with Markdown.
 
-Make sure to install the dependencies:
+## Features
+- Real-time preview
+- Syntax highlighting
+- Support for GitHub flavored Markdown
+- Easy export of Markdown files
 
-```bash
-# npm
-npm install
+## Technology Stack
+- ![nuxt](https://img.shields.io/badge/Nuxt.js-00DC82?style=for-the-badge&logo=Nuxt.js&logoColor=FFFFFF&logoWidth=14)
+- ![tailwindcss](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?style=for-the-badge&logo=Tailwind%20CSS&logoColor=FFFFFF&logoWidth=14)
+- ![codemirror](https://img.shields.io/badge/CodeMirror-D30707?style=for-the-badge&logo=CodeMirror&logoColor=FFFFFF&logoWidth=14)
+- ![marked.js](https://img.shields.io/badge/Marked.js-FFFFFF?style=for-the-badge&logo=Markdown&logoColor=000000&logoWidth=14)
 
-# pnpm
-pnpm install
+## Support me
+<br>
+<a href="https://www.buymeacoffee.com/nethris">
+  <img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=Buy%20Me%20A%20Coffee&logoColor=000000&logoWidth=14" />
+</a>
 
-# yarn
-yarn install
+## Licence
+[MIT](https://github.com/nethriis/markdownview/blob/main/LICENSE)
 
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Created with [markdownview.com](https://markdownview.com) of course ✨
