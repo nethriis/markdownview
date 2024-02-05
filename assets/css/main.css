@@ -28,7 +28,7 @@ body * {
 .cm-gutterElement {
   display: flex;
   align-items: center;
-  justify-content: end;
+  justify-content: flex-end;
 }
 
 .cm-gutter.cm-lineNumbers {
