@@ -13,8 +13,8 @@ useHead({
   link: [
     {
       rel: 'icon',
-      type: 'image/svg',
-      href: '/mdview.min.svg'
+      type: 'image/x-icon',
+      href: '/favicon.ico'
     }
   ],
   script: [
