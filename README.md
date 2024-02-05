@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/nethriis/markdownview/main/assets/images/og-image.png" />
 </a>
 
-# MarkdownView Editor
+# MarkdownView
 
 ## Introduction
 MarkdownView Editor is a web-based tool designed for editing and previewing Markdown files in real-time. Ideal for writers, developers, and content creators seeking a straightforward and efficient way to work with Markdown.
