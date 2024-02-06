@@ -1,20 +1,10 @@
 <script setup lang="ts">
-import { marked } from 'marked'
-
 const content = ref('# Welcome to MarkdownView')
 const filename = ref('README.md')
 const loading = ref(false)
 const isOpen = ref(false)
 
-const headings = computed(() => {
-  const tokens = marked.lexer(content.value, { gfm: true })
-  const filteredTokens = tokens.filter((token) => token.type === 'heading')
-  return filteredTokens.map((token) => ({
-    level: token.raw.match(/#/g)?.length || 0,
-    text: token.raw.replace(/#+\s/, '')
-  }))
-})
-const markdownToHtml = computed(() => marked(content.value))
+const headings = computed(() => getHeadings(content.value))
 
 const downloadMarkdown = () => {
   loading.value = true
@@ -50,11 +40,14 @@ const { copy, copied } = useClipboard({ source: content })
           size="18"
           class="text-gray-700 dark:text-gray-300"
         />
-        <span class="text-gray-900 dark:text-white"> Summary </span>
+        <span class="text-gray-900 dark:text-white">Summary</span>
       </h1>
       <div class="flex-grow flex flex-col justify-between">
         <ul class="space-y-1 max-h-[464px] overflow-auto">
-          <li v-for="heading of headings" :key="heading.text">
+          <li
+            v-for="(heading, i) of headings.filter((h) => h.text.length > 0)"
+            :key="i"
+          >
             <UButton variant="soft" block class="flex justify-between">
               <span
                 class="max-w-40 whitespace-nowrap overflow-hidden text-ellipsis"
@@ -144,7 +137,12 @@ const { copy, copied } = useClipboard({ source: content })
                     Summary
                   </h1>
                   <ul class="space-y-1 max-h-[464px] overflow-auto">
-                    <li v-for="heading of headings" :key="heading.text">
+                    <li
+                      v-for="(heading, i) of headings.filter(
+                        (h) => h.text.length > 0
+                      )"
+                      :key="i"
+                    >
                       <UButton
                         variant="soft"
                         block
@@ -165,12 +163,12 @@ const { copy, copied } = useClipboard({ source: content })
           </div>
         </div>
         <div
-          class="w-full max-h-[calc(100%-50px)] h-[calc(100%-50px)] flex-grow flex flex-col p-4 border-x border-b border-x-gray-200 border-b-gray-200 dark:border-x-gray-700 dark:border-b-gray-700 rounded-b-xl"
+          class="w-full max-h-[calc(100%-50px)] h-[calc(100%-50px)] flex-grow flex flex-col border-x border-b border-x-gray-200 border-b-gray-200 dark:border-x-gray-700 dark:border-b-gray-700 rounded-b-xl"
         >
-          <div
-            v-html="markdownToHtml"
-            class="view text-gray-900 dark:text-white h-full max-h-full space-y-4 overflow-auto"
-          ></div>
+          <Renderer
+            v-model="content"
+            class="text-gray-900 dark:text-white h-full max-h-full space-y-4 overflow-auto"
+          />
         </div>
       </div>
       <UButton
@@ -228,101 +226,5 @@ const { copy, copied } = useClipboard({ source: content })
 .editor * {
   tab-size: 2;
   font-family: 'Geist Mono', sans-serif !important;
-}
-
-.view h1 {
-  font-size: 2em;
-  font-weight: 600;
-  line-height: 1.25;
-  padding-bottom: 0.3em;
-  @apply border-b border-b-gray-200 dark:border-b-gray-700;
-}
-
-.view h2 {
-  font-size: 1.5em;
-  font-weight: 600;
-  line-height: 1.25;
-  padding-bottom: 0.3em;
-  @apply border-b border-b-gray-200 dark:border-b-gray-700;
-}
-
-.view h3 {
-  font-size: 1.25em;
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-.view h4 {
-  font-size: 1em;
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-.view h5 {
-  font-size: 0.875em;
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-.view h6 {
-  font-size: 0.85em;
-  font-weight: 600;
-  line-height: 1.25;
-  @apply text-gray-500 dark:text-gray-400;
-}
-
-.view p {
-  margin: 0;
-}
-
-.view a {
-  color: #0969da;
-  text-decoration: underline;
-}
-
-.view ul {
-  padding-left: 2em;
-  list-style: disc;
-}
-
-.view ol {
-  padding-left: 2em;
-  list-style: decimal;
-}
-
-.view code {
-  font-family: 'Geist Mono', sans-serif !important;
-  @apply text-sm bg-gray-200 dark:bg-gray-700 px-1.5 py-1 rounded-md;
-}
-
-.view pre {
-  @apply text-sm bg-gray-100 dark:bg-gray-800 p-4;
-}
-
-.view pre code {
-  @apply bg-gray-100 dark:bg-gray-800 p-0 rounded-none;
-}
-
-.view table {
-  @apply block;
-}
-
-.view table th {
-  font-weight: 500;
-  padding: 6px 13px;
-  @apply border border-gray-200 dark:border-gray-700;
-}
-
-.view table td {
-  padding: 6px 13px;
-  @apply border border-gray-200 dark:border-gray-700;
-}
-
-.view table tr:nth-child(2n) {
-  @apply bg-gray-50 dark:bg-gray-800;
-}
-
-.view img {
-  @apply max-w-full;
 }
 </style>
