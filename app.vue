@@ -41,6 +41,16 @@ useSeoMeta({
   twitterTitle: 'MarkdownView',
   twitterDescription: 'A simple, fast, and free markdown viewer.'
 })
+
+onMounted(() => {
+  const bmc = document.getElementById('bmc-wbtn')
+
+  if (bmc) {
+    let toHide = bmc.nextElementSibling as HTMLDivElement
+
+    toHide.style.display = 'none'
+  }
+})
 </script>
 
 <template>
