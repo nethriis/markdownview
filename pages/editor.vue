@@ -3,8 +3,33 @@ const content = ref('# Welcome to MarkdownView')
 const filename = ref('README.md')
 const loading = ref(false)
 const isOpen = ref(false)
+const importMd = ref<HTMLInputElement | null>(null)
+const isShareOpen = ref(false)
 
-const headings = computed(() => getHeadings(content.value))
+const share = useShare()
+
+const clickImport = () => {
+  if (importMd.value) {
+    importMd.value.click()
+  }
+}
+
+const onImport = (event: Event) => {
+  const file = (event.target as HTMLInputElement).files![0]
+
+  if (file) {
+    const reader = new FileReader()
+
+    reader.readAsText(file, 'UTF-8')
+    reader.onload = (evt) => {
+      content.value = String(evt.target?.result)
+      console.log(content.value)
+    }
+    reader.onerror = (_) => {
+      console.error('Error reading file')
+    }
+  }
+}
 
 const downloadMarkdown = () => {
   loading.value = true
@@ -24,7 +49,29 @@ const downloadMarkdown = () => {
   isOpen.value = true
 }
 
+const shareMarkdown = () => {
+  const encodedContent = share.encodeMarkdown(content.value)
+  const shareUrl = share.createShareUrl(encodedContent)
+
+  navigator.clipboard
+    .writeText(shareUrl)
+    .then(() => {
+      isShareOpen.value = true
+    })
+    .catch((err) => {
+      console.error('Error sharing markdown', err)
+    })
+}
+
 const { copy, copied } = useClipboard({ source: content })
+
+onMounted(() => {
+  const markdownText = share.getMarkdownFromUrl()
+
+  if (markdownText) {
+    content.value = markdownText
+  }
+})
 </script>
 
 <template>
@@ -36,36 +83,44 @@ const { copy, copied } = useClipboard({ source: content })
     >
       <h1 class="flex items-center space-x-2 dark:text-white font-medium">
         <Icon
-          name="ri:list-check"
+          name="ri:box-3-line"
           size="18"
           class="text-gray-700 dark:text-gray-300"
         />
-        <span class="text-gray-900 dark:text-white">Summary</span>
+        <span class="text-gray-900 dark:text-white">Components</span>
       </h1>
       <div class="flex-grow flex flex-col justify-between">
         <ul class="space-y-1 max-h-[464px] overflow-auto">
-          <li
-            v-for="(heading, i) of headings.filter((h) => h.text.length > 0)"
-            :key="i"
-          >
-            <UButton variant="soft" block class="flex justify-between">
-              <span
-                class="max-w-40 whitespace-nowrap overflow-hidden text-ellipsis"
-              >
-                {{ heading.text }}
-              </span>
-              <Icon :name="`ri:h-${heading.level}`" size="12" />
-            </UButton>
-          </li>
+          <li></li>
         </ul>
-        <UButton
-          block
-          icon="ri:download-line"
-          :loading="loading"
-          @click="downloadMarkdown()"
-        >
-          Download
-        </UButton>
+        <div class="space-y-2">
+          <input
+            ref="importMd"
+            type="file"
+            name="import-md"
+            id="import-md"
+            class="w-0 h-0 overflow-hidden"
+            accept=".md"
+            @change="onImport"
+          />
+          <UButton
+            block
+            variant="outline"
+            icon="ri:import-line"
+            @click="clickImport()"
+            :loading="loading"
+          >
+            Import file
+          </UButton>
+          <UButton
+            block
+            icon="ri:share-line"
+            @click="shareMarkdown()"
+            :loading="loading"
+          >
+            Share
+          </UButton>
+        </div>
       </div>
     </div>
     <div
@@ -121,42 +176,29 @@ const { copy, copied } = useClipboard({ source: content })
               {{ filename.split('.')[0] }}
             </span>
           </span>
+          <div class="hidden lg:block absolute top-2 right-12">
+            <UButton
+              block
+              icon="ri:download-line"
+              :loading="loading"
+              @click="downloadMarkdown()"
+            >
+              Download
+            </UButton>
+          </div>
           <div class="lg:hidden absolute top-2 right-12">
             <UButton square @click="downloadMarkdown()">
               <Icon name="ri:download-line" size="20" />
             </UButton>
           </div>
-          <div class="lg:hidden absolute top-2 right-2">
+          <div class="absolute top-2 right-2">
             <UPopover :popper="{ placement: 'bottom-end' }">
               <UButton variant="ghost" color="gray" square>
                 <Icon name="ri:list-check" size="20" />
               </UButton>
               <template #panel>
-                <div class="p-4 space-y-2">
-                  <h1 class="text-gray-900 dark:text-white font-medium">
-                    Summary
-                  </h1>
-                  <ul class="space-y-1 max-h-[464px] overflow-auto">
-                    <li
-                      v-for="(heading, i) of headings.filter(
-                        (h) => h.text.length > 0
-                      )"
-                      :key="i"
-                    >
-                      <UButton
-                        variant="soft"
-                        block
-                        class="flex justify-between"
-                      >
-                        <span
-                          class="max-w-40 whitespace-nowrap overflow-hidden text-ellipsis"
-                        >
-                          {{ heading.text }}
-                        </span>
-                        <Icon :name="`ri:h-${heading.level}`" size="12" />
-                      </UButton>
-                    </li>
-                  </ul>
+                <div class="p-4">
+                  <ToC v-model="content" />
                 </div>
               </template>
             </UPopover>
@@ -171,15 +213,6 @@ const { copy, copied } = useClipboard({ source: content })
           />
         </div>
       </div>
-      <UButton
-        block
-        icon="ri:download-line"
-        :loading="loading"
-        @click="downloadMarkdown()"
-        class="block sm:hidden"
-      >
-        Download
-      </UButton>
       <UModal v-model="isOpen" :ui="{ width: 'w-fit' }">
         <div class="max-w-sm p-6 space-y-6">
           <p class="text-center text-7xl">📜</p>
@@ -187,6 +220,39 @@ const { copy, copied } = useClipboard({ source: content })
             class="text-center text-lg text-gray-900 dark:text-white font-medium"
           >
             {{ filename }} generated successfully!
+          </h3>
+          <p
+            class="text-center text-sm text-gray-500 dark:text-gray-400 flex flex-col items-center space-y-2"
+          >
+            <span>
+              Thanks for using MarkdownView. Do not hesitate to give me your
+              feedback or suggestions.
+            </span>
+            <span>
+              You can support me by buying me a coffee or sponsoring me on
+              github.
+            </span>
+          </p>
+          <div class="flex justify-center space-x-4">
+            <UButton
+              variant="outline"
+              size="sm"
+              icon="ri:heart-line"
+              to="https://github.com/sponsors/nethriis"
+              target="_blank"
+            >
+              Sponsor
+            </UButton>
+          </div>
+        </div>
+      </UModal>
+      <UModal v-model="isShareOpen" :ui="{ width: 'w-fit' }">
+        <div class="max-w-sm p-6 space-y-6">
+          <p class="text-center text-7xl">📝</p>
+          <h3
+            class="text-center text-lg text-gray-900 dark:text-white font-medium"
+          >
+            Link copied to clipboard!
           </h3>
           <p
             class="text-center text-sm text-gray-500 dark:text-gray-400 flex flex-col items-center space-y-2"

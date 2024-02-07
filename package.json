@@ -36,8 +36,10 @@
     "codemirror": "^6.0.1",
     "highlight.js": "^11.9.0",
     "markdown-it": "^14.0.0",
+    "markdown-it-anchor": "^8.6.7",
     "markdown-it-emoji": "^3.0.0",
     "markdown-it-footnote": "^4.0.0",
+    "markdown-it-table-of-contents": "^0.6.0",
     "nuxt-icon": "^0.6.8"
   }
 }

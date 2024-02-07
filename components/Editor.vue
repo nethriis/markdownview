@@ -1,51 +1,61 @@
-<script lang="ts">
+<script setup lang="ts">
 import { EditorView, basicSetup } from 'codemirror'
 import { markdown } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
 import { EditorState, Transaction } from '@codemirror/state'
 import { githubDark } from '@uiw/codemirror-theme-github'
 
-export default {
-  props: ['modelValue'],
-  emits: ['update:modelValue'],
-  computed: {
-    value: {
-      get() {
-        return this.modelValue
-      },
-      set(value: string) {
-        this.$emit('update:modelValue', value)
+const model = defineModel<string>({
+  required: true
+})
+const emit = defineEmits(['update:modelValue'])
+
+const editorViewRef = ref<any>(null)
+
+onMounted(() => {
+  const updateListenerExtension = EditorState.transactionFilter.of(
+    (tr: Transaction) => {
+      if (tr.docChanged) {
+        const newValue = tr.newDoc.toString()
+        emit('update:modelValue', newValue)
       }
+      return tr
     }
-  },
-  mounted() {
-    const updateListenerExtension = EditorState.transactionFilter.of(
-      (tr: Transaction) => {
-        if (tr.docChanged) {
-          const newValue = tr.newDoc.toString()
-          this.$emit('update:modelValue', newValue)
+  )
+
+  const state = EditorState.create({
+    doc: model.value,
+    extensions: [
+      githubDark,
+      basicSetup,
+      markdown({ codeLanguages: languages }),
+      updateListenerExtension
+    ]
+  })
+
+  editorViewRef.value = new EditorView({
+    state,
+    parent: document.getElementById('editor')!
+  })
+})
+
+watch(
+  () => model.value,
+  (newValue) => {
+    if (
+      editorViewRef.value &&
+      newValue !== editorViewRef.value.state.doc.toString()
+    ) {
+      editorViewRef.value.dispatch({
+        changes: {
+          from: 0,
+          to: editorViewRef.value.state.doc.length,
+          insert: newValue
         }
-        return tr
-      }
-    )
-
-    const state = EditorState.create({
-      doc: this.value,
-      extensions: [
-        githubDark,
-        basicSetup,
-        markdown({ codeLanguages: languages }),
-        updateListenerExtension
-      ]
-    })
-
-    new EditorView({
-      state,
-      doc: this.value,
-      parent: document.getElementById('editor')!
-    })
+      })
+    }
   }
-}
+)
 </script>
 
 <template>
