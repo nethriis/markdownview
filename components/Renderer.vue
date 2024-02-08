@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import markdownit from 'markdown-it'
+import checkbox from 'markdown-it-task-checkbox'
 import { full as emoji } from 'markdown-it-emoji'
 import footnote from 'markdown-it-footnote'
 import hljs from 'highlight.js'
@@ -22,6 +23,9 @@ const md = markdownit({
     return ''
   }
 })
+  .use(checkbox, {
+    liClass: 'list-none'
+  })
   .use(emoji, { shortcuts: {} })
   .use(footnote)
 </script>
@@ -82,13 +86,19 @@ const md = markdownit({
 }
 
 .view ul {
-  padding-left: 2em;
-  list-style: disc;
+  @apply relative pl-8 list-disc;
 }
 
 .view ol {
-  padding-left: 2em;
-  list-style: decimal;
+  @apply pl-8 list-decimal;
+}
+
+.view :not(ul li) > input[type='checkbox'] {
+  @apply hidden;
+}
+
+.view ul li input[type='checkbox'] {
+  @apply mt-0 mr-[.2em] mb-[.25em] ml-[-1.4em];
 }
 
 .view code {
