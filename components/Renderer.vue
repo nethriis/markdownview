@@ -27,7 +27,7 @@ const md = markdownit({
 </script>
 
 <template>
-  <div class="view p-4" v-html="md.render(model)" />
+  <div id="preview" class="view p-4" v-html="md.render(model)" />
 </template>
 
 <style>

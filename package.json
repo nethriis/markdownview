@@ -40,6 +40,7 @@
     "markdown-it-emoji": "^3.0.0",
     "markdown-it-footnote": "^4.0.0",
     "markdown-it-table-of-contents": "^0.6.0",
-    "nuxt-icon": "^0.6.8"
+    "nuxt-icon": "^0.6.8",
+    "puppeteer": "^22.0.0"
   }
 }

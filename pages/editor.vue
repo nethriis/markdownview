@@ -5,12 +5,98 @@ const loading = ref(false)
 const isOpen = ref(false)
 const importMd = ref<HTMLInputElement | null>(null)
 const isShareOpen = ref(false)
+const exportsOpen = ref(false)
 
 const share = useShare()
 
 const clickImport = () => {
   if (importMd.value) {
     importMd.value.click()
+  }
+}
+
+const downloadMarkdown = () => {
+  loading.value = true
+  const blob = new Blob([content.value], {
+    type: 'text/markdown;charset=utf-8'
+  })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+
+  link.href = url
+  link.download = `${removeFileExtension(filename.value)}.md` || 'README.md'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+  loading.value = false
+  isOpen.value = true
+}
+
+const downloadPDF = async () => {
+  loading.value = true
+
+  try {
+    const data = await $fetch('/api/pdf', {
+      method: 'POST',
+      body: {
+        md: content.value
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      responseType: 'blob'
+    })
+
+    const url = URL.createObjectURL(data as any)
+    const link = document.createElement('a')
+
+    link.href = url
+    link.download = `${removeFileExtension(filename.value)}.pdf` || 'README.pdf'
+    document.body.appendChild(link)
+    link.click()
+
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  } catch (err) {
+    console.error('Error downloading PDF', err)
+  } finally {
+    loading.value = false
+    isOpen.value = true
+  }
+}
+
+const downloadHTML = async () => {
+  loading.value = true
+
+  try {
+    const data = await $fetch('/api/html', {
+      method: 'POST',
+      body: {
+        html: content.value
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      responseType: 'blob'
+    })
+
+    const url = URL.createObjectURL(data as any)
+    const link = document.createElement('a')
+
+    link.href = url
+    link.download =
+      `${removeFileExtension(filename.value)}.html` || 'README.html'
+    document.body.appendChild(link)
+    link.click()
+
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  } catch (err) {
+    console.error('Error downloading HTML', err)
+  } finally {
+    loading.value = false
+    isOpen.value = true
   }
 }
 
@@ -31,24 +117,6 @@ const onImport = (event: Event) => {
   }
 }
 
-const downloadMarkdown = () => {
-  loading.value = true
-  const blob = new Blob([content.value], {
-    type: 'text/markdown;charset=utf-8'
-  })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-
-  link.href = url
-  link.download = filename.value || 'README.md'
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
-  URL.revokeObjectURL(url)
-  loading.value = false
-  isOpen.value = true
-}
-
 const shareMarkdown = () => {
   const encodedContent = share.encodeMarkdown(content.value)
   const shareUrl = share.createShareUrl(encodedContent)
@@ -63,6 +131,26 @@ const shareMarkdown = () => {
     })
 }
 
+const exportItems = [
+  [
+    {
+      label: 'Markdown',
+      icon: 'ri:markdown-line',
+      click: downloadMarkdown
+    },
+    {
+      label: 'PDF',
+      icon: 'ri:file-pdf-2-line',
+      click: downloadPDF
+    },
+    {
+      label: 'HTML',
+      icon: 'ri:html5-line',
+      click: downloadHTML
+    }
+  ]
+]
+
 const { copy, copied } = useClipboard({ source: content })
 
 onMounted(() => {
@@ -76,7 +164,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="max-w-7xl sm:h-[calc(100vh-65px)] flex items-center px-4 py-4 sm:py-0 mx-auto"
+    class="max-w-7xl sm:h-[calc(100vh-65px)] flex items-center flex-col sm:flex-row px-4 py-4 sm:py-0 mx-auto"
   >
     <div
       class="lg:flex w-64 sm:h-[calc(100vh-192px)] pr-4 space-y-3 hidden flex-col"
@@ -105,21 +193,35 @@ onMounted(() => {
           />
           <UButton
             block
-            variant="outline"
-            icon="ri:import-line"
-            @click="clickImport()"
-            :loading="loading"
-          >
-            Import file
-          </UButton>
-          <UButton
-            block
+            variant="soft"
             icon="ri:share-line"
             @click="shareMarkdown()"
-            :loading="loading"
           >
             Share
           </UButton>
+          <UButton
+            block
+            variant="outline"
+            icon="ri:import-line"
+            @click="clickImport()"
+          >
+            Import file
+          </UButton>
+          <UDropdown
+            v-model:open="exportsOpen"
+            :items="exportItems"
+            :popper="{ placement: 'top-start' }"
+            class="w-full"
+          >
+            <UButton
+              block
+              :loading="loading"
+              loadingIcon="ri:loader-2-fill"
+              trailing-icon="ri:arrow-down-s-line"
+            >
+              Export
+            </UButton>
+          </UDropdown>
         </div>
       </div>
     </div>
@@ -147,10 +249,16 @@ onMounted(() => {
             name="filename"
             id="filename"
             v-model="filename"
-            class="leading-none text-sm text-gray-300 w-1/2 bg-transparent px-1 rounded-sm outline-none focus:bg-[#1e1e1e] focus:ring-1 focus:ring-blue-500"
+            class="leading-none text-sm text-gray-300 w-1/2 bg-transparent px-1 rounded-sm outline-none focus:bg-[#1e1e1e] focus:ring-1 focus:ring-indigo-500"
           />
         </div>
         <Editor v-model="content" class="max-w-full w-full h-full" />
+        <button
+          @click="clickImport()"
+          class="absolute hidden sm:block lg:hidden top-2 right-12 z-30 py-1.5 font-medium text-sm text-indigo-400 hover:bg-indigo-950 border border-indigo-400 px-2.5 rounded-md"
+        >
+          Import...
+        </button>
         <UButton
           square
           @click="copy(content)"
@@ -176,20 +284,28 @@ onMounted(() => {
               {{ filename.split('.')[0] }}
             </span>
           </span>
-          <div class="hidden lg:block absolute top-2 right-12">
-            <UButton
-              block
-              icon="ri:download-line"
-              :loading="loading"
-              @click="downloadMarkdown()"
+          <UButton
+            square
+            variant="soft"
+            @click="shareMarkdown()"
+            class="hidden sm:block lg:hidden absolute top-2 right-36"
+          >
+            <Icon name="ri:share-line" size="20" />
+          </UButton>
+          <div class="hidden sm:block lg:hidden absolute top-2 right-12">
+            <UDropdown
+              v-model:open="exportsOpen"
+              :items="exportItems"
+              :popper="{ placement: 'bottom-start' }"
             >
-              Download
-            </UButton>
-          </div>
-          <div class="lg:hidden absolute top-2 right-12">
-            <UButton square @click="downloadMarkdown()">
-              <Icon name="ri:download-line" size="20" />
-            </UButton>
+              <UButton
+                :loading="loading"
+                loadingIcon="ri:loader-2-fill"
+                trailing-icon="ri:arrow-down-s-line"
+              >
+                Export
+              </UButton>
+            </UDropdown>
           </div>
           <div class="absolute top-2 right-2">
             <UPopover :popper="{ placement: 'bottom-end' }">
@@ -213,73 +329,113 @@ onMounted(() => {
           />
         </div>
       </div>
-      <UModal v-model="isOpen" :ui="{ width: 'w-fit' }">
-        <div class="max-w-sm p-6 space-y-6">
-          <p class="text-center text-7xl">📜</p>
-          <h3
-            class="text-center text-lg text-gray-900 dark:text-white font-medium"
-          >
-            {{ filename }} generated successfully!
-          </h3>
-          <p
-            class="text-center text-sm text-gray-500 dark:text-gray-400 flex flex-col items-center space-y-2"
-          >
-            <span>
-              Thanks for using MarkdownView. Do not hesitate to give me your
-              feedback or suggestions.
-            </span>
-            <span>
-              You can support me by buying me a coffee or sponsoring me on
-              github.
-            </span>
-          </p>
-          <div class="flex justify-center space-x-4">
-            <UButton
-              variant="outline"
-              size="sm"
-              icon="ri:heart-line"
-              to="https://github.com/sponsors/nethriis"
-              target="_blank"
-            >
-              Sponsor
-            </UButton>
-          </div>
-        </div>
-      </UModal>
-      <UModal v-model="isShareOpen" :ui="{ width: 'w-fit' }">
-        <div class="max-w-sm p-6 space-y-6">
-          <p class="text-center text-7xl">📝</p>
-          <h3
-            class="text-center text-lg text-gray-900 dark:text-white font-medium"
-          >
-            Link copied to clipboard!
-          </h3>
-          <p
-            class="text-center text-sm text-gray-500 dark:text-gray-400 flex flex-col items-center space-y-2"
-          >
-            <span>
-              Thanks for using MarkdownView. Do not hesitate to give me your
-              feedback or suggestions.
-            </span>
-            <span>
-              You can support me by buying me a coffee or sponsoring me on
-              github.
-            </span>
-          </p>
-          <div class="flex justify-center space-x-4">
-            <UButton
-              variant="outline"
-              size="sm"
-              icon="ri:heart-line"
-              to="https://github.com/sponsors/nethriis"
-              target="_blank"
-            >
-              Sponsor
-            </UButton>
-          </div>
-        </div>
-      </UModal>
     </div>
+    <div class="block sm:hidden w-full space-y-2">
+      <input
+        ref="importMd"
+        type="file"
+        name="import-md"
+        id="import-md"
+        class="w-0 h-0 overflow-hidden"
+        accept=".md"
+        @change="onImport"
+      />
+      <UButton
+        block
+        variant="soft"
+        icon="ri:share-line"
+        @click="shareMarkdown()"
+      >
+        Share
+      </UButton>
+      <UButton
+        block
+        variant="outline"
+        icon="ri:import-line"
+        @click="clickImport()"
+      >
+        Import file
+      </UButton>
+      <UDropdown
+        v-model:open="exportsOpen"
+        :items="exportItems"
+        :popper="{ placement: 'top-start' }"
+        class="w-full"
+      >
+        <UButton
+          block
+          :loading="loading"
+          loadingIcon="ri:loader-2-fill"
+          trailing-icon="ri:arrow-down-s-line"
+        >
+          Export
+        </UButton>
+      </UDropdown>
+    </div>
+    <UModal v-model="isOpen" :ui="{ width: 'w-fit' }">
+      <div class="max-w-sm p-6 space-y-6">
+        <p class="text-center text-7xl">📜</p>
+        <h3
+          class="text-center text-lg text-gray-900 dark:text-white font-medium"
+        >
+          Your file has been generated successfully!
+        </h3>
+        <p
+          class="text-center text-sm text-gray-500 dark:text-gray-400 flex flex-col items-center space-y-2"
+        >
+          <span>
+            Thanks for using MarkdownView. Do not hesitate to give me your
+            feedback or suggestions.
+          </span>
+          <span>
+            You can support me by buying me a coffee or sponsoring me on github.
+          </span>
+        </p>
+        <div class="flex justify-center space-x-4">
+          <UButton
+            variant="outline"
+            size="sm"
+            icon="ri:heart-line"
+            to="https://github.com/sponsors/nethriis"
+            target="_blank"
+          >
+            Sponsor
+          </UButton>
+        </div>
+      </div>
+    </UModal>
+    <UModal v-model="isShareOpen" :ui="{ width: 'w-fit' }">
+      <div class="max-w-sm p-6 space-y-6">
+        <p class="text-center text-7xl">📝</p>
+        <h3
+          class="text-center text-lg text-gray-900 dark:text-white font-medium"
+        >
+          Link copied to clipboard!
+        </h3>
+        <p
+          class="text-center text-sm text-gray-500 dark:text-gray-400 flex flex-col items-center space-y-2"
+        >
+          <span>
+            Thanks for using MarkdownView. Do not hesitate to give me your
+            feedback or suggestions.
+          </span>
+          <span>
+            You can support me by buying me a coffee or sponsoring me on github.
+          </span>
+        </p>
+        <div class="flex justify-center space-x-4">
+          <UButton
+            variant="outline"
+            size="sm"
+            icon="ri:heart-line"
+            to="https://github.com/sponsors/nethriis"
+            target="_blank"
+          >
+            Sponsor
+          </UButton>
+        </div>
+      </div>
+    </UModal>
   </div>
 </template>
 
