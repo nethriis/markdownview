@@ -53,6 +53,7 @@ const downloadPNG = async () => {
   a.click()
   document.body.removeChild(img)
   loading.value = false
+  isOpen.value = true
 }
 
 const downloadHTML = async () => {
