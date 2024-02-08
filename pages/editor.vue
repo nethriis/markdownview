@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import html2canvas from 'html2canvas'
+
 const content = ref('# Welcome to MarkdownView')
 const filename = ref('README.md')
 const loading = ref(false)
@@ -33,37 +35,22 @@ const downloadMarkdown = () => {
   isOpen.value = true
 }
 
-const downloadPDF = async () => {
+const downloadPNG = async () => {
   loading.value = true
+  const canvas = await html2canvas(document.querySelector('.view')!, {
+    useCORS: true
+  })
+  const img = document.createElement('img')
 
-  try {
-    const data = await $fetch('/api/pdf', {
-      method: 'POST',
-      body: {
-        md: content.value
-      },
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      responseType: 'blob'
-    })
+  img.src = canvas.toDataURL('image/png')
+  document.body.appendChild(img)
 
-    const url = URL.createObjectURL(data as any)
-    const link = document.createElement('a')
+  const a = document.createElement('a')
 
-    link.href = url
-    link.download = `${removeFileExtension(filename.value)}.pdf` || 'README.pdf'
-    document.body.appendChild(link)
-    link.click()
-
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
-  } catch (err) {
-    console.error('Error downloading PDF', err)
-  } finally {
-    loading.value = false
-    isOpen.value = true
-  }
+  a.href = img.src
+  a.download = `${removeFileExtension(filename.value)}.png` || 'README.png'
+  a.click()
+  loading.value = false
 }
 
 const downloadHTML = async () => {
@@ -139,9 +126,9 @@ const exportItems = [
       click: downloadMarkdown
     },
     {
-      label: 'PDF',
-      icon: 'ri:file-pdf-2-line',
-      click: downloadPDF
+      label: 'PNG',
+      icon: 'ri:image-2-line',
+      click: downloadPNG
     },
     {
       label: 'HTML',
@@ -313,7 +300,9 @@ onMounted(() => {
                 <Icon name="ri:list-check" size="20" />
               </UButton>
               <template #panel>
-                <div class="p-4">
+                <div
+                  class="max-w-64 max-h-[calc(100vh-242px)] p-4 overflow-y-auto"
+                >
                   <ToC v-model="content" />
                 </div>
               </template>
@@ -323,10 +312,12 @@ onMounted(() => {
         <div
           class="w-full max-h-[calc(100%-50px)] h-[calc(100%-50px)] flex-grow flex flex-col border-x border-b border-x-gray-200 border-b-gray-200 dark:border-x-gray-700 dark:border-b-gray-700 rounded-b-xl"
         >
-          <Renderer
-            v-model="content"
-            class="text-gray-900 dark:text-white h-full max-h-full space-y-4 overflow-auto"
-          />
+          <div class="h-full max-h-full overflow-auto">
+            <Renderer
+              v-model="content"
+              class="text-gray-900 dark:text-white space-y-4"
+            />
+          </div>
         </div>
       </div>
     </div>

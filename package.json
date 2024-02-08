@@ -36,6 +36,7 @@
     "chrome-aws-lambda": "^10.1.0",
     "codemirror": "^6.0.1",
     "highlight.js": "^11.9.0",
+    "html2canvas": "^1.4.1",
     "markdown-it": "^14.0.0",
     "markdown-it-anchor": "^8.6.7",
     "markdown-it-emoji": "^3.0.0",
