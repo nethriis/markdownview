@@ -33,6 +33,7 @@
     "@uiw/codemirror-theme-github": "^4.21.21",
     "@vueuse/core": "^10.7.2",
     "@vueuse/nuxt": "^10.7.2",
+    "chrome-aws-lambda": "^10.1.0",
     "codemirror": "^6.0.1",
     "highlight.js": "^11.9.0",
     "markdown-it": "^14.0.0",
@@ -41,6 +42,7 @@
     "markdown-it-footnote": "^4.0.0",
     "markdown-it-table-of-contents": "^0.6.0",
     "nuxt-icon": "^0.6.8",
-    "puppeteer": "^22.0.0"
+    "puppeteer": "^22.0.0",
+    "puppeteer-core": "^10.1.0"
   }
 }

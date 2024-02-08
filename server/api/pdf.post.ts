@@ -1,5 +1,5 @@
 import markdownit from 'markdown-it'
-import puppeteer from 'puppeteer'
+import chromium from 'chrome-aws-lambda'
 
 export default defineEventHandler(async (event) => {
   const { md } = await readBody(event)
@@ -13,7 +13,16 @@ export default defineEventHandler(async (event) => {
   const html =
     "<style>*{font-family:'Inter',sans-serif;}</style>" + mdParser.render(md)
 
-  const browser = await puppeteer.launch()
+  const path = await chromium.executablePath
+  console.log(path)
+
+  const browser = await chromium.puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath,
+    headless: chromium.headless,
+    ignoreHTTPSErrors: true
+  })
   const page = await browser.newPage()
 
   await page.setContent(html, {
