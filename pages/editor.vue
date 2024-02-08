@@ -43,6 +43,7 @@ const downloadPNG = async () => {
   const img = document.createElement('img')
 
   img.src = canvas.toDataURL('image/png')
+  img.style.display = 'none'
   document.body.appendChild(img)
 
   const a = document.createElement('a')
@@ -50,6 +51,7 @@ const downloadPNG = async () => {
   a.href = img.src
   a.download = `${removeFileExtension(filename.value)}.png` || 'README.png'
   a.click()
+  document.body.removeChild(img)
   loading.value = false
 }
 
