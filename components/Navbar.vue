@@ -10,8 +10,17 @@ const isDark = computed({
 })
 
 const { data: repo } = await useFetch<any>(
-  'https://api.github.com/repos/nethriis/markdownview'
+  'https://api.github.com/repos/nethriis/markdownview',
+  { pick: ['stargazers_count'] as any }
 )
+
+const logo = ref<SVGElement | null>(null)
+
+watchEffect(() => {
+  if (logo.value) {
+    logo.value.style.fill = isDark.value ? '#818cf8' : 'rgb(79 70 229)'
+  }
+})
 </script>
 
 <template>
@@ -25,10 +34,11 @@ const { data: repo } = await useFetch<any>(
       <div class="flex items-center">
         <NuxtLink to="/">
           <svg
+            ref="logo"
             xmlns="http://www.w3.org/2000/svg"
             xml:space="preserve"
             viewBox="0 0 786 383"
-            :fill="isDark ? '#818cf8' : 'rgb(79 70 229)'"
+            fill="rgb(79 70 229)"
             class="w-16"
           >
             <path
