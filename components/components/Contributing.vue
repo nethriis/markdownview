@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const content = ref(`
-## Contributing
+const content = ref(`## Contributing
 
 Instructions for how other developers can contribute to the project. For example:
 

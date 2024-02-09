@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const content = ref(`
-## Acknowledgments
+const content = ref(`## Acknowledgments
 
 - Mention anyone who helped you
 - Inspiration sources

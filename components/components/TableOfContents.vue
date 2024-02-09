@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const content = ref(`
-## Table of Contents
+const content = ref(`## Table of Contents
 
 - [Installation](#installation)
 - [Usage](#usage)

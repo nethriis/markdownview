@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const content = ref(`
-## Usage
+const content = ref(`## Usage
 
 Show examples of how to use your project. This will help users get the most out of it.
 

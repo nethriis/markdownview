@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const content = ref(`
-![License](https://img.shields.io/badge/license-MIT-green)
+const content = ref(`![License](https://img.shields.io/badge/license-MIT-green)
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![Build Status](https://img.shields.io/travis/com/username/projectname/master.svg)
 `)

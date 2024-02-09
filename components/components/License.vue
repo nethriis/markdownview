@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const content = ref(`
-## License
+const content = ref(`## License
 
 Distributed under the MIT License. See \`LICENSE\` for more information.
 `)

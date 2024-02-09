@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const content = ref(`
-## Changelog
+const content = ref(`## Changelog
 
 - 1.0.0
   - Added feature A

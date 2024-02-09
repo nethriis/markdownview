@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import html2canvas from 'html2canvas'
 
+const share = useShare()
+
 const content = ref('# Welcome to MarkdownView')
 const filename = ref('README.md')
 const loading = ref(false)
@@ -8,8 +10,7 @@ const isOpen = ref(false)
 const importMd = ref<HTMLInputElement | null>(null)
 const isShareOpen = ref(false)
 const exportsOpen = ref(false)
-
-const share = useShare()
+const editorRef = ref<any>(null)
 
 const clickImport = () => {
   if (importMd.value) {
@@ -122,7 +123,9 @@ const shareMarkdown = () => {
 }
 
 const addToContent = (toAdd: string) => {
-  content.value += toAdd
+  if (editorRef.value) {
+    editorRef.value.insertTextAtCursor(toAdd)
+  }
 }
 
 const exportItems = [
@@ -285,7 +288,11 @@ onMounted(() => {
             class="leading-none text-sm text-gray-300 w-1/2 bg-transparent px-1 rounded-sm outline-none focus:bg-[#1e1e1e] focus:ring-1 focus:ring-indigo-500"
           />
         </div>
-        <Editor v-model="content" class="max-w-full w-full h-full" />
+        <Editor
+          ref="editorRef"
+          v-model="content"
+          class="max-w-full w-full h-full"
+        />
         <button
           @click="clickImport()"
           class="absolute hidden sm:block lg:hidden top-2 right-12 z-30 py-1.5 font-medium text-sm text-indigo-400 hover:bg-indigo-950 border border-indigo-400 px-2.5 rounded-md"

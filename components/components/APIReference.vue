@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const content = ref(`
-## API Reference
+const content = ref(`## API Reference
 
 If your project is a library, describe the functions that can be called, their parameters, and return values.
 

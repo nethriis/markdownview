@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const content = ref(`
-## Installation
+const content = ref(`## Installation
 
 Provide instructions on how to install all development dependencies and how to run an initial setup of the project.
 

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const content = ref(`
-# Project Title
+const content = ref(`# Project Title
 
 A brief description of what this project does and why it is useful.
 `)

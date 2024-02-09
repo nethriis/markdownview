@@ -9,16 +9,12 @@ export default () => {
     return `${baseUrl}?md=${encodedText}`
   }
 
-  const decodeMarkdown = (encodedText: string) => {
-    return decodeURIComponent(encodedText)
-  }
-
   const getMarkdownFromUrl = () => {
     const params = new URLSearchParams(location.search)
     const encodedText = params.get('md')
 
     if (encodedText) {
-      return decodeMarkdown(encodedText)
+      return decodeURIComponent(encodedText)
     }
     return null
   }
@@ -26,7 +22,6 @@ export default () => {
   return {
     encodeMarkdown,
     createShareUrl,
-    decodeMarkdown,
     getMarkdownFromUrl
   }
 }

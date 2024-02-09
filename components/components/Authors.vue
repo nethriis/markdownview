@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const content = ref(`
-## Authors
+const content = ref(`## Authors
 
 - **Author Name** - _Initial work_ - [@username](https://github.com/username)
 - Other contributors

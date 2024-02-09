@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const content = ref(`
-## Tests
+const content = ref(`## Tests
 
 Detail how to run the tests for this system.
 

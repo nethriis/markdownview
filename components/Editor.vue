@@ -12,6 +12,21 @@ const emit = defineEmits(['update:modelValue'])
 
 const editorViewRef = ref<any>(null)
 
+const insertTextAtCursor = (text: string) => {
+  if (!editorViewRef.value) return
+
+  const editorView = editorViewRef.value
+  const insertPos = editorView.state.selection.main.from
+
+  editorView.dispatch({
+    changes: { from: insertPos, insert: text }
+  })
+}
+
+defineExpose({
+  insertTextAtCursor
+})
+
 onMounted(() => {
   const updateListenerExtension = EditorState.transactionFilter.of(
     (tr: Transaction) => {
