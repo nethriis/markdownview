@@ -7,8 +7,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@nuxt/ui',
     '@nuxtjs/seo',
-    '@vite-pwa/nuxt',
-    '@nuxtjs/partytown'
+    '@vite-pwa/nuxt'
   ],
   postcss: {
     plugins: {
