@@ -29,6 +29,13 @@ useHead({
       'data-position': 'Right',
       'data-x_margin': '18',
       'data-y_margin': '18'
+    },
+    {
+      defer: true,
+      src: '/_vercel/insights/script.js',
+      'data-sdkn': '@vercel/analytics',
+      'data-sdkv': '1.1.3',
+      type: 'text/partytown'
     }
   ]
 })
