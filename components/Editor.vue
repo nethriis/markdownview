@@ -19,13 +19,12 @@ const insertTextAtCursor = (text: string) => {
   const insertPos = editorView.state.selection.main.from
 
   editorView.dispatch({
-    changes: { from: insertPos, insert: text }
+    changes: { from: insertPos, insert: text },
+    selection: { anchor: insertPos + text.length }
   })
 }
 
-defineExpose({
-  insertTextAtCursor
-})
+defineExpose({ insertTextAtCursor })
 
 onMounted(() => {
   const updateListenerExtension = EditorState.transactionFilter.of(
