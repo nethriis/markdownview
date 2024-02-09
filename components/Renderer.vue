@@ -89,6 +89,14 @@ const md = markdownit({
   @apply relative pl-8 list-disc;
 }
 
+.view ul ul {
+  @apply list-[circle];
+}
+
+.view ul ul ul {
+  @apply list-[square];
+}
+
 .view ol {
   @apply pl-8 list-decimal;
 }

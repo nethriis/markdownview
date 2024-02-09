@@ -121,6 +121,10 @@ const shareMarkdown = () => {
     })
 }
 
+const addToContent = (toAdd: string) => {
+  content.value += toAdd
+}
+
 const exportItems = [
   [
     {
@@ -157,62 +161,101 @@ onMounted(() => {
     class="max-w-7xl sm:h-[calc(100vh-65px)] flex items-center flex-col sm:flex-row px-4 py-4 sm:py-0 mx-auto"
   >
     <div
-      class="lg:flex w-64 sm:h-[calc(100vh-192px)] pr-4 space-y-3 hidden flex-col"
+      class="hidden lg:flex flex-col justify-between w-60 sm:max-h-[calc(100vh-192px)] sm:h-[calc(100vh-192px)] mr-4"
     >
-      <h1 class="flex items-center space-x-2 dark:text-white font-medium">
-        <Icon
-          name="ri:box-3-line"
-          size="18"
-          class="text-gray-700 dark:text-gray-300"
-        />
-        <span class="text-gray-900 dark:text-white">Components</span>
-      </h1>
-      <div class="flex-grow flex flex-col justify-between">
-        <ul class="space-y-1 max-h-[464px] overflow-auto">
-          <li></li>
-        </ul>
-        <div class="space-y-2">
-          <input
-            ref="importMd"
-            type="file"
-            name="import-md"
-            id="import-md"
-            class="w-0 h-0 overflow-hidden"
-            accept=".md"
-            @change="onImport"
+      <div
+        class="flex flex-col flex-grow sm:max-h-[calc(100vh-320px)] bg-white dark:bg-gray-900 space-y-1 rounded-lg ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm dark:shadow-none"
+      >
+        <h1
+          class="text-sm flex items-center space-x-2 dark:text-white font-medium px-4 py-2.5"
+        >
+          <Icon
+            name="ri:box-3-line"
+            size="16"
+            class="text-gray-700 dark:text-gray-300"
           />
+          <span class="text-gray-900 dark:text-white">Components</span>
+        </h1>
+        <ul class="space-y-2 px-3 pb-3 max-h-full overflow-auto">
+          <li>
+            <ComponentsTitleAndDescription @add="addToContent" />
+          </li>
+          <li>
+            <ComponentsBadges @add="addToContent" />
+          </li>
+          <li>
+            <ComponentsTableOfContents @add="addToContent" />
+          </li>
+          <li>
+            <ComponentsInstallation @add="addToContent" />
+          </li>
+          <li>
+            <ComponentsUsage @add="addToContent" />
+          </li>
+          <li>
+            <ComponentsAPIReference @add="addToContent" />
+          </li>
+          <li>
+            <ComponentsContributing @add="addToContent" />
+          </li>
+          <li>
+            <ComponentsLicense @add="addToContent" />
+          </li>
+          <li>
+            <ComponentsAuthors @add="addToContent" />
+          </li>
+          <li>
+            <ComponentsAcknowledgments @add="addToContent" />
+          </li>
+          <li>
+            <ComponentsChangelog @add="addToContent" />
+          </li>
+          <li>
+            <ComponentsTests @add="addToContent" />
+          </li>
+        </ul>
+      </div>
+      <div class="space-y-2">
+        <input
+          ref="importMd"
+          type="file"
+          name="import-md"
+          id="import-md"
+          class="w-0 h-0 hidden overflow-hidden"
+          accept=".md"
+          @change="onImport"
+        />
+        <UButton
+          block
+          variant="soft"
+          icon="ri:share-line"
+          @click="shareMarkdown()"
+        >
+          Share
+        </UButton>
+        <UButton
+          block
+          variant="outline"
+          icon="ri:import-line"
+          @click="clickImport()"
+        >
+          Import file
+        </UButton>
+        <UDropdown
+          v-model:open="exportsOpen"
+          :items="exportItems"
+          :popper="{ placement: 'top-start' }"
+          class="w-full"
+        >
           <UButton
             block
-            variant="soft"
-            icon="ri:share-line"
-            @click="shareMarkdown()"
+            :loading="loading"
+            loadingIcon="ri:loader-2-fill"
+            trailing-icon="ri:arrow-down-s-line"
           >
-            Share
+            Export
           </UButton>
-          <UButton
-            block
-            variant="outline"
-            icon="ri:import-line"
-            @click="clickImport()"
-          >
-            Import file
-          </UButton>
-          <UDropdown
-            v-model:open="exportsOpen"
-            :items="exportItems"
-            :popper="{ placement: 'top-start' }"
-            class="w-full"
-          >
-            <UButton
-              block
-              :loading="loading"
-              loadingIcon="ri:loader-2-fill"
-              trailing-icon="ri:arrow-down-s-line"
-            >
-              Export
-            </UButton>
-          </UDropdown>
-        </div>
+        </UDropdown>
       </div>
     </div>
     <div
