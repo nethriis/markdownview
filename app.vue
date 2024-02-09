@@ -54,6 +54,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <NuxtPwaManifest />
   <NuxtLoadingIndicator color="indigo" />
   <NuxtLayout>
     <NuxtPage />
